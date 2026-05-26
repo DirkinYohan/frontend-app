@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://backend-app-o4i7.onrender.com/api/$1"
+    }
+  ]
+}
+
