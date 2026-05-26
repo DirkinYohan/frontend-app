@@ -1,0 +1,385 @@
+<div class="ui-page">
+  <div class="ui-shell">
+    <aside class="ui-sidebar">
+      <div class="ui-sidebar-inner">
+        <div class="ui-brand">
+          <div class="ui-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4.5 6.5h15v3h-15v-3Zm0 8h15v3h-15v-3Zm0-4h15v3h-15v-3Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">
+              NexVenta
+            </div>
+            <div class="truncate text-xs text-slate-500">
+              Operador
+            </div>
+          </div>
+        </div>
+
+        <nav class="ui-nav" aria-label="Navegación">
+          <a
+            routerLink="/operador"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            Panel
+          </a>
+
+          <a
+            routerLink="/operador/ventas"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Nueva venta
+          </a>
+
+          <a
+            routerLink="/operador/productos"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Productos
+          </a>
+
+          <a
+            routerLink="/operador/historial"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Historial
+          </a>
+
+          <a
+            routerLink="/operador/perfil"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Perfil
+          </a>
+        </nav>
+
+        <div class="ui-sidebar-footer">
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">
+              {{ session.user()?.firstName }}
+              {{ session.user()?.lastName }}
+            </div>
+
+            <div class="truncate text-xs text-slate-500">
+              Historial de ventas
+            </div>
+          </div>
+
+          <button class="ui-btn ui-btn-primary w-full" (click)="logout()">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="ui-main">
+      <header class="ui-topbar">
+        <div class="ui-topbar-inner">
+          <div>
+            <div class="ui-title">
+              Historial de ventas
+            </div>
+
+            <div class="ui-subtitle">
+              {{ sales().length }} ventas ·
+              Total vendido:
+              $ {{ totalSold().toFixed(2) }}
+            </div>
+          </div>
+
+          <button
+            class="ui-btn ui-btn-ghost"
+            (click)="reload()"
+            [disabled]="loading()"
+          >
+            {{ loading() ? 'Cargando...' : 'Recargar' }}
+          </button>
+        </div>
+      </header>
+
+      <main class="ui-content">
+        <!-- KPIS -->
+        <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div class="ui-kpi">
+            <div class="ui-kpi-label">
+              Total ventas
+            </div>
+
+            <div class="ui-kpi-value">
+              {{ sales().length }}
+            </div>
+
+            <div class="ui-kpi-meta">
+              Ventas registradas
+            </div>
+          </div>
+
+          <div class="ui-kpi">
+            <div class="ui-kpi-label">
+              Total vendido
+            </div>
+
+            <div class="ui-kpi-value">
+              $ {{ totalSold().toFixed(2) }}
+            </div>
+
+            <div class="ui-kpi-meta">
+              Ingresos acumulados
+            </div>
+          </div>
+
+          <div class="ui-kpi">
+            <div class="ui-kpi-label">
+              Última venta
+            </div>
+
+            <div class="ui-kpi-value text-lg">
+              {{
+                sales().length > 0
+                  ? (sales()[0].createdAt | date:'shortDate')
+                  : '--'
+              }}
+            </div>
+
+            <div class="ui-kpi-meta">
+              Fecha reciente
+            </div>
+          </div>
+        </section>
+
+        <!-- FILTROS -->
+        <section class="mt-4 ui-card">
+          <div class="ui-card-header border-b border-slate-200">
+            <div>
+              <div class="text-sm font-semibold text-slate-900">
+                Filtros
+              </div>
+
+              <div class="ui-subtitle">
+                Busca por número o fecha
+              </div>
+            </div>
+          </div>
+
+          <div class="ui-card-body">
+            <form
+              class="grid grid-cols-1 gap-3 md:grid-cols-4"
+              [formGroup]="filters"
+              (ngSubmit)="reload()"
+            >
+              <input
+                class="ui-input"
+                placeholder="Buscar número..."
+                formControlName="q"
+              />
+
+              <input
+                type="date"
+                class="ui-input"
+                formControlName="from"
+              />
+
+              <input
+                type="date"
+                class="ui-input"
+                formControlName="to"
+              />
+
+              <button
+                class="ui-btn ui-btn-primary"
+                [disabled]="loading()"
+              >
+                {{ loading() ? 'Aplicando...' : 'Aplicar filtros' }}
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- LISTADO -->
+        <section class="mt-4">
+          <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div
+              *ngFor="let s of sales()"
+              class="ui-card overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div class="ui-card-body">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"
+                    >
+                      <img
+                        *ngIf="thumbId(s) as imgId"
+                        class="h-full w-full object-cover"
+                        [src]="images.url(imgId) | async"
+                        alt=""
+                        role="button"
+                        tabindex="0"
+                        (click)="openGalleryForSale(s)"
+                      />
+
+                      <div
+                        *ngIf="!thumbId(s)"
+                        class="text-xs text-slate-400"
+                      >
+                        IMG
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">
+                        {{ s.saleNumber }}
+                      </div>
+
+                      <div class="mt-1 text-xs text-slate-500">
+                        {{ s.createdAt | date:'medium' }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700"
+                  >
+                    $ {{ s.total }}
+                  </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                  <div class="rounded-2xl bg-slate-50 p-3">
+                    <div class="text-xs text-slate-500">
+                      Método de pago
+                    </div>
+
+                    <div class="mt-1 text-sm font-semibold text-slate-900">
+                      {{ s.paymentMethod }}
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl bg-slate-50 p-3">
+                    <div class="text-xs text-slate-500">
+                      Total
+                    </div>
+
+                    <div class="mt-1 text-sm font-semibold text-slate-900">
+                      $ {{ s.total }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-5 flex justify-end">
+                  <button
+                    class="ui-btn ui-btn-primary"
+                    (click)="openDetail(s.id)"
+                  >
+                    Ver detalle
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="sales().length === 0"
+            class="ui-card mt-4"
+          >
+            <div class="py-16 text-center">
+              <div class="text-base font-semibold text-slate-700">
+                No hay ventas registradas
+              </div>
+
+              <div class="mt-2 text-sm text-slate-500">
+                Las ventas aparecerán aquí automáticamente
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div *ngIf="error()" class="mt-4 ui-alert ui-alert-danger">
+          {{ error() }}
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GALERIA -->
+<div
+  *ngIf="galleryOpen()"
+  class="ui-modal-backdrop ui-fade-in"
+  (click)="closeGallery()"
+>
+  <div
+    class="ui-modal ui-slide-up overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="ui-modal-header">
+      <div class="text-sm font-semibold text-slate-900">
+        {{ galleryTitle() }}
+      </div>
+
+      <button
+        type="button"
+        class="ui-btn ui-btn-ghost !px-3 !py-1.5 !text-xs"
+        (click)="closeGallery()"
+      >
+        Cerrar
+      </button>
+    </div>
+
+    <div class="relative bg-slate-950">
+      <img
+        *ngIf="galleryImageIds().length > 0"
+        class="h-[500px] w-full object-contain"
+        [src]="images.url(galleryImageIds()[galleryIndex()]) | async"
+        alt=""
+      />
+
+      <button
+        type="button"
+        class="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-lg font-bold text-slate-900 shadow hover:bg-slate-100"
+        (click)="prevImage()"
+      >
+        ‹
+      </button>
+
+      <button
+        type="button"
+        class="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-lg font-bold text-slate-900 shadow hover:bg-slate-100"
+        (click)="nextImage()"
+      >
+        ›
+      </button>
+    </div>
+
+    <div class="ui-modal-body">
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let imgId of galleryImageIds(); let i = index"
+          type="button"
+          class="h-16 w-16 overflow-hidden rounded-2xl border border-slate-200"
+          [class.ring-2]="i === galleryIndex()"
+          [class.ring-indigo-500]="i === galleryIndex()"
+          (click)="setImageIndex(i)"
+        >
+          <img
+            class="h-full w-full object-cover"
+            [src]="images.url(imgId) | async"
+            alt=""
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

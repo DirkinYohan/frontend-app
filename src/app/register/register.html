@@ -1,0 +1,309 @@
+<div class="min-h-screen bg-[#f5f5fb] flex items-center justify-center overflow-hidden px-6 py-10">
+
+  <!-- Fondo -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-violet-100 blur-3xl opacity-60"></div>
+    <div class="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-indigo-100 blur-3xl opacity-60"></div>
+  </div>
+
+  <!-- Card principal -->
+  <div class="relative grid w-full max-w-6xl overflow-hidden rounded-[32px] bg-white shadow-[0_20px_80px_rgba(124,58,237,0.15)] lg:grid-cols-2">
+
+    <!-- Panel izquierdo -->
+    <div class="hidden lg:flex flex-col justify-center bg-gradient-to-br from-[#faf8ff] to-white px-16 py-20">
+
+      <!-- Logo -->
+      <div class="mb-10 flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-violet-600 to-indigo-500 shadow-xl">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="h-12 w-12 text-white"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+
+          <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 17V7m4 10V4m4 13v-6M5 20h14"/>
+
+        </svg>
+
+      </div>
+
+      <!-- Texto -->
+      <h1 class="text-6xl font-extrabold tracking-tight text-slate-900">
+        NexVenta
+      </h1>
+
+      <p class="mt-4 text-3xl font-medium text-violet-600">
+        API de Ventas
+      </p>
+
+      <div class="mt-8 h-[3px] w-28 rounded-full bg-violet-500"></div>
+
+      <p class="mt-10 max-w-md text-xl leading-relaxed text-slate-500">
+        Crea tu tienda y administra productos, ventas y operadores desde un solo lugar.
+      </p>
+
+      <!-- Características -->
+      <div class="mt-16 grid grid-cols-3 gap-10">
+
+        <!-- Seguro -->
+        <div class="flex flex-col items-center">
+          <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-100">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-7 w-7 text-violet-600"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+
+              <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 11c0-1.657 1.343-3 3-3s3 1.343 3 3v2a3 3 0 11-6 0v-2z"/>
+
+              <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 10a7 7 0 1114 0v1H5v-1z"/>
+
+            </svg>
+
+          </div>
+
+          <span class="text-sm font-medium text-slate-600">
+            Seguro
+          </span>
+        </div>
+
+        <!-- Rápido -->
+        <div class="flex flex-col items-center">
+          <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-100">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-7 w-7 text-violet-600"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+
+              <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"/>
+
+            </svg>
+
+          </div>
+
+          <span class="text-sm font-medium text-slate-600">
+            Rápido
+          </span>
+        </div>
+
+        <!-- Confiable -->
+        <div class="flex flex-col items-center">
+          <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-100">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-7 w-7 text-violet-600"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+
+              <path stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 15a4 4 0 014-4 5 5 0 019.9 1H17a4 4 0 010 8H7a4 4 0 01-4-4z"/>
+
+            </svg>
+
+          </div>
+
+          <span class="text-sm font-medium text-slate-600">
+            Confiable
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Formulario -->
+    <div class="flex items-center justify-center bg-white px-8 py-14 sm:px-14">
+
+      <div class="w-full max-w-lg">
+
+        <!-- Título -->
+        <div class="mb-10 text-center">
+
+          <h2 class="text-5xl font-extrabold tracking-tight text-slate-900">
+            Crear Cuenta
+          </h2>
+
+          <p class="mt-4 text-lg text-slate-500">
+            Registro de Administrador
+          </p>
+
+        </div>
+
+        <!-- Form -->
+        <form
+          class="grid grid-cols-1 gap-5 sm:grid-cols-2"
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+        >
+
+          <!-- Nombre -->
+          <div>
+
+            <label class="mb-2 block text-sm font-semibold text-slate-700">
+              Nombre
+            </label>
+
+            <input
+              formControlName="firstName"
+              type="text"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+            />
+
+            <p *ngIf="showError('firstName')" class="mt-2 text-sm text-rose-500">
+              Campo requerido
+            </p>
+
+          </div>
+
+          <!-- Apellido -->
+          <div>
+
+            <label class="mb-2 block text-sm font-semibold text-slate-700">
+              Apellido
+            </label>
+
+            <input
+              formControlName="lastName"
+              type="text"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+            />
+
+            <p *ngIf="showError('lastName')" class="mt-2 text-sm text-rose-500">
+              Campo requerido
+            </p>
+
+          </div>
+
+          <!-- Identificación -->
+          <div class="sm:col-span-2">
+
+            <label class="mb-2 block text-sm font-semibold text-slate-700">
+              Identificación
+            </label>
+
+            <input
+              formControlName="identification"
+              type="text"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+            />
+
+            <p *ngIf="showError('identification')" class="mt-2 text-sm text-rose-500">
+              Campo requerido
+            </p>
+
+          </div>
+
+          <!-- Email -->
+          <div class="sm:col-span-2">
+
+            <label class="mb-2 block text-sm font-semibold text-slate-700">
+              Correo electrónico
+            </label>
+
+            <input
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+            />
+
+            <p *ngIf="showError('email')" class="mt-2 text-sm text-rose-500">
+              Correo inválido
+            </p>
+
+          </div>
+
+          <!-- Password -->
+          <div class="sm:col-span-2">
+
+            <label class="mb-2 block text-sm font-semibold text-slate-700">
+              Contraseña
+            </label>
+
+            <input
+              type="password"
+              formControlName="password"
+              autocomplete="new-password"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+            />
+
+            <p *ngIf="showError('password')" class="mt-2 text-sm text-rose-500">
+              Mínimo 8 caracteres
+            </p>
+
+          </div>
+
+          <!-- Error -->
+          <div
+            *ngIf="error()"
+            class="sm:col-span-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600"
+          >
+            {{ error() }}
+          </div>
+
+          <!-- Botón -->
+          <div class="sm:col-span-2">
+
+            <button
+              type="submit"
+              [disabled]="loading()"
+              class="w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-4 text-lg font-semibold text-white shadow-lg transition duration-300 hover:scale-[1.01] hover:shadow-violet-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {{ loading() ? 'Creando…' : 'Crear cuenta' }}
+            </button>
+
+          </div>
+
+        </form>
+
+        <!-- Inicio de sesión -->
+        <div class="mt-10">
+
+          <div class="relative mb-6">
+
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-slate-200"></div>
+            </div>
+
+            <div class="relative flex justify-center text-sm">
+              <span class="bg-white px-4 text-slate-400">
+                ¿Ya tienes cuenta?
+              </span>
+            </div>
+
+          </div>
+
+          <a
+            routerLink="/login"
+            class="flex items-center justify-center rounded-2xl border border-violet-200 py-4 text-base font-semibold text-violet-600 transition hover:bg-violet-50"
+          >
+            Iniciar sesión
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,597 @@
+<div class="min-h-screen bg-[#f6f7fb]">
+
+  <!-- Background -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden">
+    <div class="absolute -left-32 top-0 h-[420px] w-[420px] rounded-full bg-violet-200/40 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-indigo-200/40 blur-3xl"></div>
+  </div>
+
+  <div class="relative flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden w-[280px] border-r border-slate-200 bg-white xl:flex">
+
+      <div class="flex w-full flex-col px-6 py-8">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+
+          <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 class="h-7 w-7"
+                 xmlns="http://www.w3.org/2000/svg">
+
+              <path
+                d="M4 13.5V20h6.5v-6.5H4Zm9.5-9.5V20H20V4h-6.5ZM4 4v6.5h6.5V4H4Z"
+                fill="currentColor"
+              />
+
+            </svg>
+
+          </div>
+
+          <div>
+
+            <div class="text-xl font-extrabold tracking-tight text-slate-900">
+              NexVenta
+            </div>
+
+            <div class="text-sm text-slate-500">
+              Inventario inteligente
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Menu -->
+        <nav class="mt-12 space-y-3">
+
+          <a
+            routerLink="/admin"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Panel
+          </a>
+
+          <a
+            routerLink="/admin/productos"
+            class="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-sm font-semibold text-white shadow-lg"
+          >
+            Productos
+          </a>
+
+          <a
+            routerLink="/admin/categorias"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Categorías
+          </a>
+
+          <a
+            routerLink="/admin/operadores"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Operadores
+          </a>
+
+          <a
+            routerLink="/admin/ventas"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Ventas
+          </a>
+
+          <a
+            routerLink="/admin/reportes"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Reportes
+          </a>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="mt-auto rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+
+          <div class="text-sm font-semibold text-slate-900">
+            {{ session.user()?.firstName }} {{ session.user()?.lastName }}
+          </div>
+
+          <div class="mt-1 text-xs text-slate-500">
+            Gestión de inventario
+          </div>
+
+          <button
+            class="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.01]"
+            (click)="logout()"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1">
+
+      <!-- Header -->
+      <header class="border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+
+        <div class="flex items-center justify-between px-8 py-6">
+
+          <div>
+
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">
+              Productos
+            </h1>
+
+            <p class="mt-1 text-sm text-slate-500">
+              Crea, administra y controla tu inventario
+            </p>
+
+          </div>
+
+          <button
+            class="rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02]"
+            (click)="reloadProducts()"
+          >
+            Recargar
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- Content -->
+      <main class="px-8 py-8">
+
+        <div class="grid grid-cols-1 gap-8 2xl:grid-cols-[520px_1fr]">
+
+          <!-- Formulario -->
+          <section class="rounded-[32px] border border-slate-200 bg-white shadow-sm">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-100 px-8 py-6">
+
+              <div>
+
+                <div class="text-2xl font-bold tracking-tight text-slate-900">
+                  {{ editingId() ? 'Editar producto' : 'Nuevo producto' }}
+                </div>
+
+                <div class="mt-1 text-sm text-slate-500">
+                  {{
+                    editingId()
+                      ? 'Actualiza información del producto'
+                      : 'Agrega productos con stock e imágenes'
+                  }}
+                </div>
+
+              </div>
+
+              <a
+                routerLink="/admin/categorias"
+                class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              >
+                Categorías
+              </a>
+
+            </div>
+
+            <!-- Body -->
+            <div class="p-8">
+
+              <!-- Alert -->
+              <div
+                *ngIf="categories().length === 0"
+                class="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-700"
+              >
+                Primero crea al menos una categoría.
+              </div>
+
+              <!-- Form -->
+              <form
+                class="mt-6 space-y-5"
+                [formGroup]="form"
+                (ngSubmit)="onSubmit()"
+              >
+
+                <!-- Nombre y código -->
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      Nombre
+                    </label>
+
+                    <input
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="name"
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      Código
+                    </label>
+
+                    <input
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="code"
+                    />
+
+                  </div>
+
+                </div>
+
+                <!-- Categoria -->
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      Categoría
+                    </label>
+
+                    <select
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="categoryId"
+                    >
+
+                      <option
+                        *ngFor="let c of categories()"
+                        [value]="c.id"
+                      >
+                        {{ c.name }}
+                      </option>
+
+                    </select>
+
+                  </div>
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      Stock mínimo
+                    </label>
+
+                    <input
+                      type="number"
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="stockMinimum"
+                    />
+
+                  </div>
+
+                </div>
+
+                <!-- Precios -->
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      Precio compra
+                    </label>
+
+                    <input
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="purchasePrice"
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      Precio venta
+                    </label>
+
+                    <input
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="salePrice"
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                      {{ editingId() ? 'Stock actual' : 'Stock inicial' }}
+                    </label>
+
+                    <input
+                      type="number"
+                      class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                      formControlName="initialStock"
+                    />
+
+                  </div>
+
+                </div>
+
+                <!-- Descripción -->
+                <div>
+
+                  <label class="mb-2 block text-sm font-semibold text-slate-700">
+                    Descripción
+                  </label>
+
+                  <textarea
+                    rows="4"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                    formControlName="description"
+                  ></textarea>
+
+                </div>
+
+                <!-- Upload -->
+                <div>
+
+                  <label class="mb-2 block text-sm font-semibold text-slate-700">
+                    Imágenes
+                  </label>
+
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/png,image/jpeg,image/webp"
+                    class="w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-5 text-sm text-slate-500"
+                    (change)="onFilesSelected($event)"
+                  />
+
+                  <div class="mt-2 text-sm text-slate-500">
+                    Seleccionadas: {{ selectedFiles().length }}
+                  </div>
+
+                  <!-- Preview -->
+                  <div
+                    *ngIf="selectedPreviewUrls().length > 0"
+                    class="mt-5 flex flex-wrap gap-3"
+                  >
+
+                    <button
+                      *ngFor="let url of selectedPreviewUrls(); let i = index"
+                      type="button"
+                      class="h-20 w-20 overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-lg"
+                      (click)="$event.preventDefault(); openSelectedGallery(i)"
+                    >
+
+                      <img
+                        class="h-full w-full object-cover"
+                        [src]="url"
+                        alt=""
+                      />
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+                  <button
+                    class="rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-4 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.01]"
+                    [disabled]="loading() || categories().length === 0"
+                  >
+                    {{
+                      loading()
+                        ? 'Guardando…'
+                        : editingId()
+                          ? 'Guardar cambios'
+                          : 'Crear producto'
+                    }}
+                  </button>
+
+                  <button
+                    type="button"
+                    *ngIf="editingId()"
+                    class="rounded-2xl border border-slate-200 py-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                    (click)="cancelEdit()"
+                  >
+                    Cancelar
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </section>
+
+          <!-- Tabla -->
+          <section class="rounded-[32px] border border-slate-200 bg-white shadow-sm">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-100 px-8 py-6">
+
+              <div>
+
+                <div class="text-2xl font-bold tracking-tight text-slate-900">
+                  Productos
+                </div>
+
+                <div class="mt-1 text-sm text-slate-500">
+                  {{ products().length }} productos registrados
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+
+              <table class="min-w-full">
+
+                <thead class="bg-slate-50">
+
+                  <tr>
+
+                    <th class="px-6 py-5 text-left text-sm font-semibold text-slate-700">
+                      Producto
+                    </th>
+
+                    <th class="px-6 py-5 text-left text-sm font-semibold text-slate-700">
+                      Stock
+                    </th>
+
+                    <th class="px-6 py-5 text-left text-sm font-semibold text-slate-700">
+                      Estado
+                    </th>
+
+                    <th class="px-6 py-5 text-right text-sm font-semibold text-slate-700">
+                      Acciones
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  <tr
+                    *ngFor="let p of products()"
+                    class="border-t border-slate-100 transition hover:bg-slate-50"
+                  >
+
+                    <!-- Producto -->
+                    <td class="px-6 py-5">
+
+                      <div class="flex items-center gap-4">
+
+                        <img
+                          *ngIf="p.imageIds.length > 0"
+                          class="h-14 w-14 rounded-2xl border border-slate-200 object-cover shadow-sm"
+                          [src]="images.url(p.imageIds[0]) | async"
+                          alt=""
+                        />
+
+                        <div>
+
+                          <div class="font-semibold text-slate-900">
+                            {{ p.name }}
+                          </div>
+
+                          <div class="mt-1 text-sm text-slate-500">
+                            {{ p.code }} · {{ p.categoryName }}
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </td>
+
+                    <!-- Stock -->
+                    <td class="px-6 py-5">
+
+                      <div class="font-bold text-slate-900">
+                        {{ p.stockCurrent }}
+                      </div>
+
+                      <div
+                        *ngIf="p.stockCurrent <= p.stockMinimum"
+                        class="mt-1 text-xs font-medium text-amber-600"
+                      >
+                        Bajo stock
+                      </div>
+
+                    </td>
+
+                    <!-- Estado -->
+                    <td class="px-6 py-5">
+
+                      <span
+                        class="inline-flex rounded-full px-4 py-2 text-xs font-semibold"
+                        [class.bg-emerald-100]="p.active"
+                        [class.text-emerald-700]="p.active"
+                        [class.bg-slate-100]="!p.active"
+                        [class.text-slate-600]="!p.active"
+                      >
+                        {{ p.active ? 'Activo' : 'Inactivo' }}
+                      </span>
+
+                    </td>
+
+                    <!-- Acciones -->
+                    <td class="px-6 py-5">
+
+                      <div class="flex flex-wrap items-center justify-end gap-2">
+
+                        <button
+                          class="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                          (click)="startEdit(p)"
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
+                          (click)="toggleActive(p)"
+                        >
+                          {{ p.active ? 'Desactivar' : 'Activar' }}
+                        </button>
+
+                        <button
+                          class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+                          (click)="remove(p)"
+                        >
+                          Eliminar
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                  <!-- Empty -->
+                  <tr *ngIf="products().length === 0">
+
+                    <td
+                      colspan="4"
+                      class="px-6 py-16 text-center text-sm text-slate-500"
+                    >
+                      Sin productos registrados
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </section>
+
+        </div>
+
+        <!-- Error -->
+        <div
+          *ngIf="error()"
+          class="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-600"
+        >
+          {{ error() }}
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+</div>

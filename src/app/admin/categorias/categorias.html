@@ -1,0 +1,379 @@
+<div class="min-h-screen bg-[#f6f7fb]">
+
+  <!-- Background -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden">
+    <div class="absolute -left-32 top-0 h-[420px] w-[420px] rounded-full bg-violet-200/40 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-indigo-200/40 blur-3xl"></div>
+  </div>
+
+  <div class="relative flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden w-[280px] border-r border-slate-200 bg-white xl:flex">
+
+      <div class="flex w-full flex-col px-6 py-8">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+
+          <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 class="h-7 w-7"
+                 xmlns="http://www.w3.org/2000/svg">
+
+              <path
+                d="M4 13.5V20h6.5v-6.5H4Zm9.5-9.5V20H20V4h-6.5ZM4 4v6.5h6.5V4H4Z"
+                fill="currentColor"
+              />
+
+            </svg>
+
+          </div>
+
+          <div>
+
+            <div class="text-xl font-extrabold tracking-tight text-slate-900">
+              NexVenta
+            </div>
+
+            <div class="text-sm text-slate-500">
+              Organización del catálogo
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Navigation -->
+        <nav class="mt-12 space-y-3">
+
+          <a
+            routerLink="/admin"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Panel
+          </a>
+
+          <a
+            routerLink="/admin/productos"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Productos
+          </a>
+
+          <a
+            routerLink="/admin/categorias"
+            class="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-sm font-semibold text-white shadow-lg"
+          >
+            Categorías
+          </a>
+
+          <a
+            routerLink="/admin/operadores"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Operadores
+          </a>
+
+          <a
+            routerLink="/admin/ventas"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Ventas
+          </a>
+
+          <a
+            routerLink="/admin/reportes"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Reportes
+          </a>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="mt-auto rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+
+          <div class="text-sm font-semibold text-slate-900">
+            {{ session.user()?.firstName }} {{ session.user()?.lastName }}
+          </div>
+
+          <div class="mt-1 text-xs text-slate-500">
+            Administración de categorías
+          </div>
+
+          <button
+            class="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.01]"
+            (click)="logout()"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1">
+
+      <!-- Header -->
+      <header class="border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+
+        <div class="flex items-center justify-between px-8 py-6">
+
+          <div>
+
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">
+              Categorías
+            </h1>
+
+            <p class="mt-1 text-sm text-slate-500">
+              Organiza tu catálogo de productos
+            </p>
+
+          </div>
+
+          <button
+            class="rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02]"
+            (click)="reload()"
+            [disabled]="loading()"
+          >
+            {{ loading() ? 'Cargando…' : 'Recargar' }}
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- Content -->
+      <main class="px-8 py-8">
+
+        <div class="grid grid-cols-1 gap-8 xl:grid-cols-[480px_1fr]">
+
+          <!-- Form Card -->
+          <section class="rounded-[32px] border border-slate-200 bg-white shadow-sm">
+
+            <!-- Header -->
+            <div class="border-b border-slate-100 px-8 py-6">
+
+              <div class="text-2xl font-bold tracking-tight text-slate-900">
+                {{ editingId() ? 'Editar categoría' : 'Nueva categoría' }}
+              </div>
+
+              <div class="mt-1 text-sm text-slate-500">
+                Nombre y descripción opcional
+              </div>
+
+            </div>
+
+            <!-- Body -->
+            <div class="p-8">
+
+              <form
+                class="space-y-6"
+                [formGroup]="form"
+                (ngSubmit)="onSubmit()"
+              >
+
+                <!-- Nombre -->
+                <div>
+
+                  <label class="mb-2 block text-sm font-semibold text-slate-700">
+                    Nombre
+                  </label>
+
+                  <input
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                    formControlName="name"
+                  />
+
+                </div>
+
+                <!-- Descripción -->
+                <div>
+
+                  <label class="mb-2 block text-sm font-semibold text-slate-700">
+                    Descripción
+                  </label>
+
+                  <textarea
+                    rows="5"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+                    formControlName="description"
+                  ></textarea>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+                  <button
+                    class="rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-4 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.01]"
+                    [disabled]="loading()"
+                  >
+                    {{
+                      loading()
+                        ? 'Guardando…'
+                        : (editingId()
+                          ? 'Guardar cambios'
+                          : 'Crear categoría')
+                    }}
+                  </button>
+
+                  <button
+                    *ngIf="editingId()"
+                    type="button"
+                    class="rounded-2xl border border-slate-200 py-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                    (click)="cancelEdit()"
+                  >
+                    Cancelar
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </section>
+
+          <!-- List -->
+          <section class="rounded-[32px] border border-slate-200 bg-white shadow-sm">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-100 px-8 py-6">
+
+              <div>
+
+                <div class="text-2xl font-bold tracking-tight text-slate-900">
+                  Categorías
+                </div>
+
+                <div class="mt-1 text-sm text-slate-500">
+                  {{ categories().length }} categorías registradas
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Body -->
+            <div class="p-8">
+
+              <div class="space-y-4">
+
+                <!-- Item -->
+                <div
+                  *ngFor="let c of categories()"
+                  class="group rounded-[28px] border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:-translate-y-1 hover:border-violet-200 hover:bg-white hover:shadow-xl"
+                >
+
+                  <div class="flex items-start justify-between gap-5">
+
+                    <!-- Info -->
+                    <div class="min-w-0">
+
+                      <div class="flex items-center gap-3">
+
+                        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-md">
+
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                               class="h-6 w-6"
+                               fill="none"
+                               viewBox="0 0 24 24"
+                               stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M7 7h10M7 12h10M7 17h10"/>
+
+                          </svg>
+
+                        </div>
+
+                        <div>
+
+                          <div class="text-lg font-bold tracking-tight text-slate-900">
+                            {{ c.name }}
+                          </div>
+
+                          <div
+                            *ngIf="c.description"
+                            class="mt-1 text-sm leading-relaxed text-slate-500"
+                          >
+                            {{ c.description }}
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex shrink-0 items-center gap-3">
+
+                      <button
+                        class="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+                        (click)="startEdit(c)"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-3 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+                        (click)="remove(c)"
+                      >
+                        Eliminar
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <!-- Empty -->
+                <div
+                  *ngIf="categories().length === 0"
+                  class="rounded-[28px] border border-dashed border-slate-300 bg-slate-50 px-6 py-16 text-center"
+                >
+
+                  <div class="text-lg font-semibold text-slate-700">
+                    No hay categorías
+                  </div>
+
+                  <div class="mt-2 text-sm text-slate-500">
+                    Crea tu primera categoría para organizar productos
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+        <!-- Error -->
+        <div
+          *ngIf="error()"
+          class="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-600"
+        >
+          {{ error() }}
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+</div>

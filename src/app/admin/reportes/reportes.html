@@ -1,0 +1,499 @@
+<div class="min-h-screen bg-[#f6f7fb]">
+
+  <!-- Background -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden">
+    <div class="absolute -left-32 top-0 h-[420px] w-[420px] rounded-full bg-violet-200/40 blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-indigo-200/40 blur-3xl"></div>
+  </div>
+
+  <div class="relative flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="hidden w-[280px] border-r border-slate-200 bg-white xl:flex">
+
+      <div class="flex w-full flex-col px-6 py-8">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+
+          <div class="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 class="h-7 w-7"
+                 xmlns="http://www.w3.org/2000/svg">
+
+              <path
+                d="M4 13.5V20h6.5v-6.5H4Zm9.5-9.5V20H20V4h-6.5ZM4 4v6.5h6.5V4H4Z"
+                fill="currentColor"
+              />
+
+            </svg>
+
+          </div>
+
+          <div>
+
+            <div class="text-xl font-extrabold tracking-tight text-slate-900">
+              NexVenta
+            </div>
+
+            <div class="text-sm text-slate-500">
+              Analítica y reportes
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Navigation -->
+        <nav class="mt-12 space-y-3">
+
+          <a
+            routerLink="/admin"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Panel
+          </a>
+
+          <a
+            routerLink="/admin/productos"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Productos
+          </a>
+
+          <a
+            routerLink="/admin/categorias"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Categorías
+          </a>
+
+          <a
+            routerLink="/admin/operadores"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Operadores
+          </a>
+
+          <a
+            routerLink="/admin/ventas"
+            class="flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+          >
+            Ventas
+          </a>
+
+          <a
+            routerLink="/admin/reportes"
+            class="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-sm font-semibold text-white shadow-lg"
+          >
+            Reportes
+          </a>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="mt-auto rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+
+          <div class="text-sm font-semibold text-slate-900">
+            {{ session.user()?.firstName }} {{ session.user()?.lastName }}
+          </div>
+
+          <div class="mt-1 text-xs text-slate-500">
+            Panel analítico
+          </div>
+
+          <button
+            class="mt-5 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.01]"
+            (click)="logout()"
+          >
+            Cerrar sesión
+          </button>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1">
+
+      <!-- Header -->
+      <header class="border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+
+        <div class="flex flex-col gap-6 px-8 py-6 xl:flex-row xl:items-center xl:justify-between">
+
+          <div>
+
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">
+              Reportes
+            </h1>
+
+            <p class="mt-1 text-sm text-slate-500">
+              Ventas, ganancias, top productos y bajo stock
+            </p>
+
+          </div>
+
+          <!-- Filters -->
+          <form
+            class="grid grid-cols-1 gap-3 sm:grid-cols-3"
+            [formGroup]="filters"
+            (ngSubmit)="reload()"
+          >
+
+            <input
+              type="date"
+              class="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+              formControlName="from"
+            />
+
+            <input
+              type="date"
+              class="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+              formControlName="to"
+            />
+
+            <select
+              class="rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm text-slate-700 outline-none transition focus:border-violet-500 focus:ring-4 focus:ring-violet-100"
+              formControlName="operatorId"
+            >
+
+              <option value="">
+                Todos
+              </option>
+
+              <option
+                *ngFor="let o of operators()"
+                [value]="o.id"
+              >
+                {{ o.firstName }} {{ o.lastName }}
+              </option>
+
+            </select>
+
+            <button
+              class="sm:col-span-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.01]"
+              [disabled]="loading()"
+            >
+              {{ loading() ? 'Actualizando…' : 'Actualizar reportes' }}
+            </button>
+
+          </form>
+
+        </div>
+
+      </header>
+
+      <!-- Content -->
+      <main class="px-8 py-8">
+
+        <!-- KPI -->
+        <section
+          class="grid grid-cols-1 gap-6 md:grid-cols-4"
+          *ngIf="report() as r"
+        >
+
+          <div class="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
+
+            <div class="text-sm font-medium text-slate-500">
+              Total ventas
+            </div>
+
+            <div class="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
+              {{ r.totalSales }}
+            </div>
+
+            <div class="mt-2 text-sm text-slate-500">
+              Transacciones: {{ r.totalSalesCount }}
+            </div>
+
+          </div>
+
+          <div class="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
+
+            <div class="text-sm font-medium text-slate-500">
+              Ganancias
+            </div>
+
+            <div class="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
+              {{ r.totalProfit }}
+            </div>
+
+            <div class="mt-2 text-sm text-slate-500">
+              Rango seleccionado
+            </div>
+
+          </div>
+
+          <div class="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
+
+            <div class="text-sm font-medium text-slate-500">
+              Bajo stock
+            </div>
+
+            <div class="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
+              {{ r.lowStockProducts.length }}
+            </div>
+
+            <div class="mt-2 text-sm text-slate-500">
+              Top productos: {{ r.topProducts.length }}
+            </div>
+
+          </div>
+
+          <div class="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
+
+            <div class="text-sm font-medium text-slate-500">
+              Productos vendidos
+            </div>
+
+            <div class="mt-3 text-4xl font-extrabold tracking-tight text-slate-900">
+              {{ r.totalProductsSold }}
+            </div>
+
+            <div class="mt-2 text-sm text-slate-500">
+              Unidades en el rango seleccionado
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Daily Sales -->
+        <section
+          class="mt-8 rounded-[32px] border border-slate-200 bg-white shadow-sm"
+          *ngIf="report() as r"
+        >
+
+          <div class="border-b border-slate-100 px-8 py-6">
+
+            <div class="text-2xl font-bold tracking-tight text-slate-900">
+              Ventas diarias
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+              Resumen visual del rango seleccionado
+            </div>
+
+          </div>
+
+          <div class="p-8">
+
+            <div
+              class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6"
+              *ngIf="dailyPoints().length > 0; else noDaily"
+            >
+
+              <div
+                *ngFor="let p of dailyPoints()"
+                class="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+
+                <!-- Image -->
+                <div class="relative h-36 overflow-hidden bg-slate-100">
+
+                  <img
+                    *ngIf="p.productPrimaryImageId as imgId"
+                    class="h-full w-full object-cover"
+                    [src]="images.url(imgId) | async"
+                    alt=""
+                  />
+
+                  <div
+                    *ngIf="!p.productPrimaryImageId"
+                    class="absolute inset-0 bg-gradient-to-br from-violet-500 to-indigo-600"
+                  ></div>
+
+                </div>
+
+                <!-- Info -->
+                <div class="p-4">
+
+                  <div class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    {{ p.date }}
+                  </div>
+
+                  <div class="mt-2 truncate text-sm font-medium text-slate-700">
+                    {{ operatorLabel(p) }}
+                  </div>
+
+                  <div class="mt-3 text-2xl font-bold tracking-tight text-slate-900">
+                    {{ p.total }}
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <ng-template #noDaily>
+
+              <div class="rounded-2xl border border-dashed border-slate-300 py-14 text-center text-sm text-slate-500">
+                Sin ventas en el rango seleccionado
+              </div>
+
+            </ng-template>
+
+          </div>
+
+        </section>
+
+        <!-- Products -->
+        <section
+          class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2"
+          *ngIf="report() as r"
+        >
+
+          <!-- Top Products -->
+          <div class="rounded-[32px] border border-slate-200 bg-white shadow-sm">
+
+            <div class="border-b border-slate-100 px-8 py-6">
+
+              <div class="text-2xl font-bold tracking-tight text-slate-900">
+                Top productos
+              </div>
+
+              <div class="mt-1 text-sm text-slate-500">
+                Más vendidos
+              </div>
+
+            </div>
+
+            <div class="space-y-3 p-6">
+
+              <div
+                *ngFor="let p of r.topProducts"
+                class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:bg-white"
+              >
+
+                <div class="flex min-w-0 items-center gap-4">
+
+                  <div class="h-14 w-14 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+
+                    <img
+                      *ngIf="p.productPrimaryImageId as imgId"
+                      class="h-full w-full object-cover"
+                      [src]="images.url(imgId) | async"
+                      alt=""
+                    />
+
+                  </div>
+
+                  <div class="min-w-0">
+
+                    <div class="truncate font-semibold text-slate-900">
+                      {{ p.code }} · {{ p.name }}
+                    </div>
+
+                    <div class="mt-1 text-xs text-slate-500">
+                      Unidades vendidas
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div class="rounded-full bg-violet-100 px-4 py-2 text-sm font-semibold text-violet-700">
+                  {{ p.unitsSold }}
+                </div>
+
+              </div>
+
+              <div
+                *ngIf="r.topProducts.length === 0"
+                class="rounded-2xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-500"
+              >
+                Sin datos
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Low Stock -->
+          <div class="rounded-[32px] border border-slate-200 bg-white shadow-sm">
+
+            <div class="border-b border-slate-100 px-8 py-6">
+
+              <div class="text-2xl font-bold tracking-tight text-slate-900">
+                Bajo stock
+              </div>
+
+              <div class="mt-1 text-sm text-slate-500">
+                Productos por debajo del mínimo
+              </div>
+
+            </div>
+
+            <div class="space-y-3 p-6">
+
+              <div
+                *ngFor="let p of r.lowStockProducts"
+                class="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:bg-white"
+              >
+
+                <div class="flex min-w-0 items-center gap-4">
+
+                  <div class="h-14 w-14 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+
+                    <img
+                      *ngIf="p.productPrimaryImageId as imgId"
+                      class="h-full w-full object-cover"
+                      [src]="images.url(imgId) | async"
+                      alt=""
+                    />
+
+                  </div>
+
+                  <div class="min-w-0">
+
+                    <div class="truncate font-semibold text-slate-900">
+                      {{ p.code }} · {{ p.name }}
+                    </div>
+
+                    <div class="mt-1 text-xs text-slate-500">
+                      Stock actual / mínimo
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div class="rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-700">
+                  {{ p.stockCurrent }}/{{ p.stockMinimum }}
+                </div>
+
+              </div>
+
+              <div
+                *ngIf="r.lowStockProducts.length === 0"
+                class="rounded-2xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-500"
+              >
+                Sin datos
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Error -->
+        <div
+          *ngIf="error()"
+          class="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-600"
+        >
+          {{ error() }}
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+</div>

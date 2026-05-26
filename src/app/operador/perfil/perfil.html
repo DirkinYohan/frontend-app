@@ -1,0 +1,271 @@
+<div class="ui-page">
+  <div class="ui-shell">
+    <aside class="ui-sidebar">
+      <div class="ui-sidebar-inner">
+        <div class="ui-brand">
+          <div class="ui-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4.5 6.5h15v3h-15v-3Zm0 8h15v3h-15v-3Zm0-4h15v3h-15v-3Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">NexVenta</div>
+            <div class="truncate text-xs text-slate-500">Operador</div>
+          </div>
+        </div>
+
+        <nav class="ui-nav" aria-label="Navegación">
+          <a
+            routerLink="/operador"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            Panel
+          </a>
+          <a
+            routerLink="/operador/ventas"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Nueva venta
+          </a>
+          <a
+            routerLink="/operador/productos"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Productos
+          </a>
+          <a
+            routerLink="/operador/historial"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Historial
+          </a>
+          <a
+            routerLink="/operador/perfil"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Perfil
+          </a>
+        </nav>
+
+        <div class="ui-sidebar-footer">
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">
+              {{ session.user()?.firstName }} {{ session.user()?.lastName }}
+            </div>
+            <div class="truncate text-xs text-slate-500">
+              Cuenta y seguridad
+            </div>
+          </div>
+
+          <button class="ui-btn ui-btn-primary w-full" (click)="logout()">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="ui-main">
+      <header class="ui-topbar">
+        <div class="ui-topbar-inner">
+          <div>
+            <div class="ui-title">Perfil</div>
+            <div class="ui-subtitle">
+              Administra tu información personal y seguridad
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="ui-content">
+        <div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
+          
+          <!-- PERFIL -->
+          <section class="ui-card xl:col-span-2">
+            <div class="ui-card-header">
+              <div>
+                <div class="text-sm font-semibold text-slate-900">
+                  Información personal
+                </div>
+                <div class="ui-subtitle">
+                  Actualiza tus datos de acceso
+                </div>
+              </div>
+            </div>
+
+            <div class="ui-card-body">
+              <form
+                class="space-y-5"
+                [formGroup]="profileForm"
+                (ngSubmit)="saveProfile()"
+              >
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label class="ui-label">Nombre</label>
+                    <input
+                      class="ui-input mt-1"
+                      formControlName="firstName"
+                      placeholder="Ingresa tu nombre"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="ui-label">Apellido</label>
+                    <input
+                      class="ui-input mt-1"
+                      formControlName="lastName"
+                      placeholder="Ingresa tu apellido"
+                    />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label class="ui-label">Identificación</label>
+                    <input
+                      class="ui-input mt-1"
+                      formControlName="identification"
+                      placeholder="Número de identificación"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="ui-label">Correo electrónico</label>
+                    <input
+                      type="email"
+                      class="ui-input mt-1"
+                      formControlName="email"
+                      placeholder="correo@empresa.com"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  class="ui-btn ui-btn-primary w-full"
+                  [disabled]="loading()"
+                >
+                  {{ loading() ? 'Guardando cambios…' : 'Guardar cambios' }}
+                </button>
+              </form>
+            </div>
+          </section>
+
+          <!-- INFO LATERAL -->
+          <section class="space-y-5">
+            <div class="ui-card">
+              <div class="ui-card-body">
+                <div class="flex items-center gap-4">
+                  <div
+                    class="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 text-xl font-bold text-indigo-700"
+                  >
+                    {{ session.user()?.firstName?.charAt(0) }}
+                  </div>
+
+                  <div class="min-w-0">
+                    <div class="truncate text-base font-semibold text-slate-900">
+                      {{ session.user()?.firstName }}
+                      {{ session.user()?.lastName }}
+                    </div>
+
+                    <div class="truncate text-sm text-slate-500">
+                      {{ session.user()?.email }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                  <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <div class="text-xs text-slate-500">Rol</div>
+                    <div class="mt-1 text-sm font-semibold text-slate-900">
+                      Operador
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <div class="text-xs text-slate-500">Estado</div>
+                    <div class="mt-1 text-sm font-semibold text-emerald-600">
+                      Activo
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTRASEÑA -->
+            <section class="ui-card">
+              <div class="ui-card-header">
+                <div>
+                  <div class="text-sm font-semibold text-slate-900">
+                    Seguridad
+                  </div>
+
+                  <div class="ui-subtitle">
+                    Cambia tu contraseña
+                  </div>
+                </div>
+              </div>
+
+              <div class="ui-card-body">
+                <form
+                  class="space-y-4"
+                  [formGroup]="passwordForm"
+                  (ngSubmit)="changePassword()"
+                >
+                  <div>
+                    <label class="ui-label">Contraseña actual</label>
+
+                    <input
+                      type="password"
+                      class="ui-input mt-1"
+                      formControlName="currentPassword"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="ui-label">Nueva contraseña</label>
+
+                    <input
+                      type="password"
+                      class="ui-input mt-1"
+                      formControlName="newPassword"
+                      placeholder="Mínimo 8 caracteres"
+                    />
+                  </div>
+
+                  <button
+                    class="ui-btn ui-btn-success w-full"
+                    [disabled]="loading()"
+                  >
+                    {{
+                      loading()
+                        ? 'Actualizando contraseña…'
+                        : 'Cambiar contraseña'
+                    }}
+                  </button>
+                </form>
+              </div>
+            </section>
+          </section>
+        </div>
+
+        <div *ngIf="success()" class="mt-4 ui-alert ui-alert-success">
+          {{ success() }}
+        </div>
+
+        <div *ngIf="error()" class="mt-4 ui-alert ui-alert-danger">
+          {{ error() }}
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

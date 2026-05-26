@@ -1,0 +1,221 @@
+<div class="ui-page">
+  <div class="ui-shell">
+    <aside class="ui-sidebar">
+      <div class="ui-sidebar-inner">
+        <div class="ui-brand">
+          <div class="ui-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4.5 6.5h15v3h-15v-3Zm0 8h15v3h-15v-3Zm0-4h15v3h-15v-3Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">NexVenta</div>
+            <div class="truncate text-xs text-slate-500">Operador</div>
+          </div>
+        </div>
+
+        <nav class="ui-nav" aria-label="Navegación">
+          <a
+            routerLink="/operador"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            Panel
+          </a>
+          <a
+            routerLink="/operador/ventas"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Nueva venta
+          </a>
+          <a
+            routerLink="/operador/productos"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Productos
+          </a>
+          <a
+            routerLink="/operador/historial"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Historial
+          </a>
+          <a
+            routerLink="/operador/perfil"
+            class="ui-nav-link"
+            routerLinkActive="ui-nav-link-active"
+          >
+            Perfil
+          </a>
+        </nav>
+
+        <div class="ui-sidebar-footer">
+          <div class="min-w-0">
+            <div class="truncate text-sm font-semibold text-slate-900">
+              {{ session.user()?.firstName }} {{ session.user()?.lastName }}
+            </div>
+            <div class="truncate text-xs text-slate-500">Catálogo disponible para ventas</div>
+          </div>
+          <button class="ui-btn ui-btn-primary w-full" (click)="logout()">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="ui-main">
+      <header class="ui-topbar">
+        <div class="ui-topbar-inner">
+          <div>
+            <div class="ui-title">Productos</div>
+            <div class="ui-subtitle">{{ products().length }} productos</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="ui-btn ui-btn-ghost" (click)="reloadProducts()">Recargar</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="ui-content">
+        <section class="ui-card">
+          <div class="ui-card-header">
+            <div>
+              <div class="text-sm font-semibold text-slate-900">Filtros</div>
+              <div class="ui-subtitle">Nombre, código, categoría y bajo stock</div>
+            </div>
+          </div>
+          <div class="ui-card-body">
+            <form class="grid grid-cols-1 gap-2 md:grid-cols-3" [formGroup]="filters" (ngSubmit)="reloadProducts()">
+              <input class="ui-input" placeholder="Buscar por nombre o código…" formControlName="q" />
+              <select class="ui-select" formControlName="categoryId">
+                <option value="">Todas</option>
+                <option *ngFor="let c of categories()" [value]="c.id">{{ c.name }}</option>
+              </select>
+              <label class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
+                <input type="checkbox" class="accent-indigo-600" formControlName="lowStockOnly" />
+                Solo bajo stock
+              </label>
+              <button class="ui-btn ui-btn-primary md:col-span-3" [disabled]="loading()">
+                {{ loading() ? 'Cargando…' : 'Aplicar filtros' }}
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <section class="mt-4 ui-card">
+          <div class="ui-card-header">
+            <div>
+              <div class="text-sm font-semibold text-slate-900">Listado</div>
+              <div class="ui-subtitle">Toca la imagen para ver galería</div>
+            </div>
+          </div>
+          <div class="ui-card-body">
+            <div class="ui-table-wrap">
+              <table class="ui-table">
+                <thead class="ui-thead">
+                  <tr>
+                    <th class="ui-th">Código</th>
+                    <th class="ui-th">Producto</th>
+                    <th class="ui-th text-right">Stock</th>
+                    <th class="ui-th text-right">Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of products()" class="ui-tr">
+                    <td class="ui-td font-medium text-slate-900">{{ p.code }}</td>
+                    <td class="ui-td">
+                      <div class="flex items-center gap-3">
+                        <img
+                          *ngIf="p.imageIds.length > 0"
+                          class="h-10 w-10 rounded-xl border border-slate-200 object-cover shadow-sm"
+                          [src]="images.url(p.imageIds[0]) | async"
+                          alt="img"
+                          role="button"
+                          tabindex="0"
+                          (click)="openGallery(p, p.imageIds[0])"
+                        />
+                        <div class="min-w-0">
+                          <div class="truncate font-medium text-slate-900">{{ p.name }}</div>
+                          <div class="truncate text-xs text-slate-500" *ngIf="p.description">{{ p.description }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="ui-td text-right">
+                      <span class="ui-badge" [class.ui-badge-warn]="p.stockCurrent <= p.stockMinimum" [class.ui-badge-muted]="p.stockCurrent > p.stockMinimum">
+                        {{ p.stockCurrent }}
+                      </span>
+                    </td>
+                    <td class="ui-td text-right font-medium text-slate-900">{{ p.salePrice }}</td>
+                  </tr>
+                  <tr *ngIf="products().length === 0">
+                    <td colspan="4" class="px-4 py-12 text-center text-sm text-slate-500">Sin resultados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <div *ngIf="error()" class="mt-4 ui-alert ui-alert-danger">
+          {{ error() }}
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="galleryOpen()" class="ui-modal-backdrop ui-fade-in" (click)="closeGallery()">
+  <div class="ui-modal ui-slide-up" (click)="$event.stopPropagation()">
+    <div class="ui-modal-header">
+      <div class="text-sm font-semibold text-slate-900">{{ galleryTitle() }}</div>
+      <button type="button" class="ui-btn ui-btn-ghost !px-3 !py-1.5 !text-xs" (click)="closeGallery()">
+        Cerrar
+      </button>
+    </div>
+
+    <div class="relative bg-slate-950">
+      <img
+        *ngIf="galleryImageIds().length > 0"
+        class="h-[360px] w-full object-contain"
+        [src]="images.url(galleryImageIds()[galleryIndex()]) | async"
+        alt=""
+      />
+      <button
+        type="button"
+        class="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-white"
+        (click)="prevImage()"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-white"
+        (click)="nextImage()"
+      >
+        ›
+      </button>
+    </div>
+
+    <div class="ui-modal-body">
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let imgId of galleryImageIds(); let i = index"
+          type="button"
+          class="h-14 w-14 overflow-hidden rounded-xl border border-slate-200 shadow-sm"
+          [class.ring-2]="i === galleryIndex()"
+          [class.ring-indigo-500]="i === galleryIndex()"
+          (click)="setImageIndex(i)"
+        >
+          <img class="h-full w-full object-cover" [src]="images.url(imgId) | async" alt="" />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
