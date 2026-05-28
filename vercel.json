@@ -2,8 +2,10 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://backend-app-o4i7.onrender.com/api/$1"
+      "destination": "https://backend-app-62a8.onrender.com/api/$1"
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/frontend-app/browser"
 }
 
